@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Locator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/TextPlugin.min.js"></script>
+
+    <style>
+    body{
+        color: white;
+        background : black;
+    }
+    .navbar-custom {
+        background-color: black;
+    }
+    .navbar-custom .navbar-brand, .navbar-custom .nav-link, .navbar-custom .btn, .navbar-custom .form-control {
+        color: #3FFF00;
+    }
+    .navbar-custom .btn-outline-success {
+        color: white;
+        border-color: white;
+    }
+    .navbar-custom .btn-outline-success:hover {
+        color: black;
+        background-color: white;
+        border-color: white;
+    }
+    .navbar-custom {
+        border : 1px solid #3FFF00;
+        margin:8px;
+    }
+    .navbar-brand{
+            
+        padding: 4px;
+        border-radius: 60px;
+        padding-left:30px;
+        padding-right:30px;
+        border : 1px solid white;
+    }
+    .navbar-brand:hover{       
+        background-color: #3FFF00;
+        color: black;
+        padding: 4px;
+        border-radius: 60px;
+        padding-left:30px;
+        padding-right:30px;
+
+    }
+    #map-locator{
+        margin-left:40px;
+    }
+    #search{
+        background-color: black;
+        color: white;
+    }
+    #container1{
+        background:  rgb(27,27,22);
+        padding: 10px;      
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        width: 100%;
+        border-bottom: 3px solid #3FFF00; 
+    }
+    {% comment %} .V{
+        background: #3FFF00;;
+        border-radius: 55px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        transform: rotate(90deg);
+        font-size:20px;
+        cursor: pointer;
+        border: 2px solid white;
+    }
+    .V:hover {
+        background: black;
+        color: #3FFF00;
+        border: 2px solid #3FFF00;
+    } {% endcomment %}
+
+    .V{
+        margin-right:10px;
+        color: #3FFF00;
+        background: black;
+        border-radius: 55px;
+        padding-top: 8px;
+        padding-bottom: 8px;
+        transform: rotate(90deg);
+        font-size:20px;
+        cursor: pointer;
+        border: 2px solid #3FFF00;
+    }
+    .V:hover {
+        background: #3FFF00;
+        color: black;
+        border: 2px solid white;
+    }
+    .append{
+        background: rgb(27,27,22);
+        color: white;
+        padding: 10px;
+        
+        text-transform: capitalize;
+        width: 80%;
+        {% comment %} border-top: 1px solid white;  {% endcomment %}
+        border-bottom: 1px solid white; 
+        display: none;
+    }
+    #append-here{
+        {% comment %} padding-left: 78px; {% endcomment %}
+        {% comment %} padding-right: 18px; {% endcomment %}
+        width: 100%;
+
+    }
+    #map_locator_table{
+        {% comment %} align-items: center; {% endcomment %}
+        text-align: center;
+    }
+
+    #locator_highlight, #analysis_highlight{
+        background-color: #3FFF00;
+        color: black;
+    }
+    .rating-css div{
+        color: #ffe400;
+        font-size: 22px;
+        padding: 12px;
+    }
+    .rating-css input{
+        display: none;
+    }
+    .rating-css input + label{
+        text-shadow: 1px 1px 0 #ffe400;
+        cursor: pointer;
+    }
+    .rating-css input:checked + label ~ label{
+        color: #838383;
+    }
+    .rating-css label:active{
+        transform: scale(0.8);
+        transition: 0.3s ease;
+    }
+    #rating{
+        color: #3FFF00;
+    }
+    .typewriter h1 span {
+        padding-top:0px;
+        border-right: 2px solid white; /* White color cursor */
+        animation: typing 2s steps(20, end), blink-caret 0.75s step-end infinite;
+        {% comment %} text-transform: uppercase; {% endcomment %}
+    }
+    
+    @keyframes typing {
+        from { width: 0; }
+        to { width: 100%; }
+    }
+    
+    @keyframes blink-caret {
+        from, to { border-color: transparent; }
+        50% { border-color: green; } 
+    }
+
+    .typewriter span{
+        color: #3FFF00;
+        font-size:150px;
+        
+    }
+    .typewriter{
+        margin:20px;
+    
+    }
+    #col-name th b {
+        font-size:25px;
+    }
+    body{
+        border: 2px solid #3FFF00;
+        margin:10px;
+        
+    }
+    @media only screen and (max-width: 767px) {
+        .typewriter h1{
+            scale: 0.8;
+            padding: 0px;  
+        }
+
+    }
+    
+    #container{
+        color: #3FFF00;
+        scale:1.2;
+        padding-left: 15px;
+    }
+
+
+    </style>
+</head>
+<body>
+    <br><br>
+    <nav class="navbar navbar-custom">
+        <div class="container-fluid">
+
+            {% if request.path == "/MapLocator/" %}
+            <a href="/MapLocator/" id="locator_highlight" class="navbar-brand" >Map Locator</a>
+
+            {% else %}
+            <a href="/MapLocator/" id="locator" class="navbar-brand" >Map Locator</a>
+            {% endif %}
+
+            {% if request.path == "/MapLocator/analysis/" %}
+            <a href="/MapLocator/analysis/" id="analysis_highlight" class="navbar-brand">Map Analysis </a>
+            {% else %}
+            <a href="/MapLocator/analysis/" id="analysis" class="navbar-brand">Map Analysis </a>
+            {% endif %}
+
+           <div class="rating-css">
+        <div class="star-icon"><span id="rating">Rating :</span>
+            <input type="radio" name="rating" id="rating1">
+            <label for="rating1" class="fa fa-star"></label>
+
+            <input type="radio" name="rating" id="rating2">
+            <label for="rating2" class="fa fa-star"></label>
+
+            <input type="radio" name="rating" id="rating3">
+            <label for="rating3" class="fa fa-star"></label>
+
+            <input type="radio" name="rating" id="rating4">
+            <label for="rating4" class="fa fa-star"></label>
+
+            <input type="radio" name="rating" id="rating5">
+            <label for="rating5" class="fa fa-star"></label>
+        </div>
+    </div>
+    </nav>
+
+<div class="container">
+<div class="typewriter">
+    <h1><span></span></h1>
+</div>
+</div>
+<div class="container" id="map_locator_table">
+<table class="table table-striped">
+    <thead id="col-name">
+        
+            <b> 
+            <th><b>S no</b></th>
+            <th><b>Location</b></th>
+            <th><b>Time</b></th> 
+            </b>
+        
+    </thead>
+    <tbody>
+        {% for search in searches %}
+        <tr>
+            <td>{{ search.id }}</td>
+            <td>{{ search.Location }}</td>
+            <td>{{ search.Time }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+<br><br>
+<div id="main-container">
+    <div id="main-box">
+        <div id="container1" class="container">
+            <span id="container">Most searched places</span>
+            <button class="V">></button>
+        </div>
+        <div id="append-here"  class="container"></div>
+        <div class="append">{{max_location}}</div>
+        {% comment %} <div class="append">{{max_count}}</div> {% endcomment %}
+    </div>
+
+    <div id="main-box">
+        <div id="container1" class="container">
+            <span id="container">Least searched places</span>
+            <button class="V">></button>
+        </div>
+        <div id="append-here"  class="container"></div>
+        <div class="append">{{min_location}}</div>
+        {% comment %} <div class="append">{{min_count}}</div> {% endcomment %}
+    </div>
+
+    <div id="main-box">
+        <div id="container1" class="container">
+            <span id="container">Last searched places</span>
+            <button class="V">></button>
+        </div>
+        <div id="append-here" class="container"></div>
+        <div class="append">{{last_location}}</div>
+    </div>
+
+    <div id="main-box">
+        <div id="container1" class="container">
+            <span id="container">First searched places</span>
+            <button class="V">></button>
+        </div>
+        <div id="append-here" class="container"></div>
+        <div class="append">{{first_location}}</div>
+    </div>
+</div>
+<br>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $('.V').on('click', function(e){
+            e.preventDefault();
+            var $mainBox = $(this).closest('#main-box');
+            var $container = $mainBox.find('#container1');
+            var $append = $mainBox.find('.append');
+            
+            $append.width($container.width());
+            $mainBox.find('#append-here').append($append.slideToggle());
+
+            
+             // Toggle button text
+        var currentText = $(this).text();
+        if (currentText === '>') {
+            $(this).html("&lt;");
+        } else {
+            $(this).html(">");
+        }
+
+        });
+    });
+
+
+   
+    gsap.to('#locator', {
+        x: 40, 
+        yoyo: true, 
+        repeat: -1,
+        borderColor: 'green',
+        borderWidth: '2px',
+        duration: 1
+    });
+    gsap.to('#locator_highlight', {
+        x: 40, 
+        yoyo: true, 
+        repeat: -1,
+        borderColor: 'green',
+        borderWidth: '5px',
+        duration: 1
+    });
+    gsap.to('#analysis', {
+        x: -40, 
+        yoyo: true, 
+        repeat: -1,
+        borderColor: 'green',
+        borderWidth: '3px',
+        duration: 1
+    });
+    gsap.to('#analysis_highlight', {
+        x: -40, 
+        yoyo: true, 
+        repeat: -1,
+        borderColor: '#66FF00',
+        borderWidth: '5px',
+        duration: 1
+    });        
+
+          
+
+    gsap.registerPlugin(TextPlugin);
+
+    const textAnimation = gsap.to('.typewriter h1 span', {
+        duration: 2,
+        text: {
+            value: "Map Analysis",
+            
+            delimiter: ""
+        },
+        ease: "none",
+        repeat: -1,
+        repeatDelay: 1,
+        yoyo: true
+    });
+
+
+</script>
+</body>
+</html>
